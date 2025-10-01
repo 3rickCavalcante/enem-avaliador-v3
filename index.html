@@ -747,7 +747,7 @@
                     
                     if (notas[1] < 160) {
                         feedback2 += "<li>Desenvolva mais a introdução, apresentando claramente o tema</li>";
-                        feedback2 += "<li>Evide tangenciar o tema ou fugir do assunto proposto</li>";
+                        feedback2 += "<li>Evite tangenciar o tema ou fugir do assunto proposto</li>";
                     }
                     
                     if (notas[1] < 140) {
@@ -809,4 +809,185 @@
                     
                     if (notas[3] < 160) {
                         feedback4 += "<li>Pratique o uso de pronomes para retomar elementos mencionados anteriormente</li>";
-                       
+                        feedback4 += "<li>Organize melhor as informações dentro de cada parágrafo</li>";
+                    }
+                    
+                    if (notas[3] < 140) {
+                        feedback4 += "<li>Estude os diferentes tipos de coesão (referencial, sequencial, lexical)</li>";
+                        feedback4 += "<li>Pratique a substituição de palavras repetidas por sinônimos</li>";
+                    }
+                    
+                    if (notas[3] < 120) {
+                        feedback4 += "<li>Reveja os principais conectivos e suas funções no texto</li>";
+                        feedback4 += "<li>Pratique a reescrita de parágrafos para melhorar a fluidez</li>";
+                    }
+                    
+                    feedback4 += "</ul>";
+                } else {
+                    feedback4 = "<p><strong>Parabéns! Você demonstrou excelente conhecimento dos mecanismos linguísticos para coesão textual.</strong></p>";
+                }
+                feedbacksDetalhados.push(feedback4);
+                
+                // Competência 5: Proposta de intervenção
+                let feedback5 = "";
+                if (notas[4] < 200) {
+                    feedback5 = "<p><strong>Como melhorar:</strong></p><ul>";
+                    
+                    if (notas[4] < 180) {
+                        feedback5 += "<li>Detalhe melhor os meios para implementar sua proposta</li>";
+                        feedback5 += "<li>Especifique claramente os agentes envolvidos na solução</li>";
+                    }
+                    
+                    if (notas[4] < 160) {
+                        feedback5 += "<li>Garanta que sua proposta esteja relacionada aos argumentos desenvolvidos</li>";
+                        feedback5 += "<li>Inclua os 5 elementos da proposta: agente, ação, meio/modo, finalidade e detalhamento</li>";
+                    }
+                    
+                    if (notas[4] < 140) {
+                        feedback5 += "<li>Evite propostas genéricas como 'conscientização' ou 'campanhas educativas'</li>";
+                        feedback5 += "<li>Pratique a elaboração de propostas específicas e viáveis</li>";
+                    }
+                    
+                    if (notas[4] < 120) {
+                        feedback5 += "<li>Estude o que caracteriza uma boa proposta de intervenção no ENEM</li>";
+                        feedback5 += "<li>Garanta que sua proposta respeite os direitos humanos</li>";
+                    }
+                    
+                    feedback5 += "</ul>";
+                } else {
+                    feedback5 = "<p><strong>Parabéns! Você demonstrou excelente elaboração de proposta de intervenção.</strong></p>";
+                }
+                feedbacksDetalhados.push(feedback5);
+                
+                return feedbacksDetalhados;
+            }
+
+            gerarSugestoes(notas, analise) {
+                const sugestoes = [];
+                
+                if (notas[0] < 160) {
+                    sugestoes.push("• Revise as regras gramaticais, especialmente concordância verbal e pontuação.");
+                }
+                
+                if (notas[1] < 160) {
+                    sugestoes.push("• Mantenha o foco no tema proposto e desenvolva-o de forma mais abrangente.");
+                }
+                
+                if (notas[2] < 160) {
+                    sugestoes.push("• Desenvolva mais seus argumentos com exemplos concretos e dados relevantes.");
+                }
+                
+                if (notas[3] < 160) {
+                    sugestoes.push("• Utilize mais conectivos para melhorar a fluidez e coesão do texto.");
+                }
+                
+                if (notas[4] < 160) {
+                    sugestoes.push("• Elabore uma proposta de intervenção mais detalhada, indicando agente, ação e finalidade.");
+                }
+
+                if (analise.numPalavras < 300) {
+                    sugestoes.push("• Desenvolva mais suas ideias para atingir o número ideal de palavras (entre 300-500).");
+                }
+
+                if (analise.numParagrafos < 4) {
+                    sugestoes.push("• Estruture seu texto em mais parágrafos para melhor organização (introdução, 2-3 desenvolvimentos, conclusão).");
+                }
+
+                if (sugestoes.length === 0) {
+                    sugestoes.push("• Continue praticando para manter o excelente desempenho!");
+                }
+
+                return sugestoes;
+            }
+        }
+
+        // Interface do usuário
+        document.addEventListener('DOMContentLoaded', function() {
+            const textarea = document.getElementById('texto-redacao');
+            const themeInput = document.getElementById('tema-redacao');
+            const charCount = document.getElementById('contador-caracteres');
+            const btnAvaliar = document.getElementById('btn-avaliar');
+            const loading = document.getElementById('loading');
+            const avaliacaoDetalhada = document.getElementById('avaliacao-detalhada');
+            const placeholderText = document.querySelector('.placeholder-text');
+            
+            const avaliador = new AvaliadorENEM();
+            
+            // Atualizar contador de palavras
+            textarea.addEventListener('input', function() {
+                const words = textarea.value.trim().split(/\s+/).filter(word => word.length > 0);
+                const count = words.length;
+                charCount.textContent = `${count} palavras`;
+                
+                btnAvaliar.disabled = count < 100;
+            });
+            
+            // Avaliar redação
+            btnAvaliar.addEventListener('click', function() {
+                const texto = textarea.value.trim();
+                const tema = themeInput.value.trim() || 'Tema geral';
+                
+                if (texto.length < 100) {
+                    showError('Sua redação precisa ter pelo menos 100 palavras para ser avaliada.');
+                    return;
+                }
+                
+                loading.style.display = 'block';
+                avaliacaoDetalhada.style.display = 'none';
+                placeholderText.style.display = 'none';
+                clearError();
+                
+                // Simular processamento
+                setTimeout(function() {
+                    const resultado = avaliador.avaliarRedacao(texto, tema);
+                    exibirResultados(resultado);
+                    loading.style.display = 'none';
+                    avaliacaoDetalhada.style.display = 'block';
+                }, 1500);
+            });
+            
+            function exibirResultados(resultado) {
+                document.getElementById('nota-final').textContent = resultado.notaFinal;
+                
+                for (let i = 0; i < 5; i++) {
+                    const scoreElement = document.getElementById(`score${i+1}`);
+                    const progressElement = document.getElementById(`progress${i+1}`);
+                    const feedbackElement = document.getElementById(`feedback${i+1}`);
+                    const feedbackDetailsElement = document.getElementById(`feedback-details${i+1}`);
+                    
+                    const score = resultado.notas[i];
+                    scoreElement.textContent = score;
+                    progressElement.style.width = `${score / 2}%`;
+                    feedbackElement.textContent = resultado.feedbacks[i];
+                    feedbackDetailsElement.innerHTML = resultado.feedbacksDetalhados[i];
+                }
+                
+                const sugestoesLista = document.getElementById('sugestoes-lista');
+                sugestoesLista.innerHTML = '';
+                
+                resultado.sugestoes.forEach(sugestao => {
+                    const div = document.createElement('div');
+                    div.className = 'suggestion-item';
+                    div.textContent = sugestao;
+                    sugestoesLista.appendChild(div);
+                });
+            }
+            
+            function showError(message) {
+                clearError();
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.textContent = message;
+                document.querySelector('.input-section').insertBefore(errorDiv, btnAvaliar);
+            }
+            
+            function clearError() {
+                const existingError = document.querySelector('.error-message');
+                if (existingError) {
+                    existingError.remove();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
